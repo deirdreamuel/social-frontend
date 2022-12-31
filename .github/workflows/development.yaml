@@ -5,6 +5,20 @@ on:
     branches:
       - development
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
   
 jobs:
   deploy:
@@ -20,6 +34,8 @@ jobs:
         run: yarn install
 
       - name: Generate Distribution Files
+        env:
+          API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
         run: yarn generate
 
       - name: Set AWS Credentials
