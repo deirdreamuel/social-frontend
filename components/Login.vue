@@ -3,6 +3,17 @@
     <v-card-title>Sign in to Social</v-card-title>
     <v-list-item>
       <v-list-item-content>
+        <div v-if="message">
+          <v-alert
+            type="error"
+            text
+            close-text="Close Alert"
+            dismissible
+            @input="message=''"
+          >
+            {{ message }}
+          </v-alert>
+        </div>
         <Textfield
           :dense="true"
           :label="email.label"
@@ -17,13 +28,11 @@
           :value="password.val"
           @update="password.update"
         ></Textfield>
-        <v-btn block text @click="login" :color="!(message)? 'normal': 'error'"> LOG IN </v-btn>
-        <p class="message d-flex justify-center pt-1">
-            {{ message }}
-        </p>
-
-        <div>
-          Create account? <a href="/signup">Sign up</a>
+        <v-btn block text @click="login" :color="!message ? 'normal' : 'error'">
+          LOG IN
+        </v-btn>
+        <div class="pt-5">
+          <div>Create account? <a href="/signup">Sign up</a></div>
         </div>
       </v-list-item-content>
     </v-list-item>
@@ -31,7 +40,12 @@
 </template>
 
 <script>
-import { defineComponent, useContext, ref, useRouter } from "@nuxtjs/composition-api";
+import {
+  defineComponent,
+  useContext,
+  ref,
+  useRouter,
+} from "@nuxtjs/composition-api";
 
 import Textfield from "~/components/fields/textfield.vue";
 import { textfield } from "~/models/textfield";
@@ -44,25 +58,26 @@ export default defineComponent({
     let password = new textfield("password", "hello");
     const { $axios } = useContext();
     const router = useRouter();
-    
-    const message = ref('');
+
+    const message = ref("");
     const login = () => {
       const request = {
         email: email.val,
-        password: password.val
-      }
+        password: password.val,
+      };
 
-      $axios.$post("/v1/auth/login", request, {
+      $axios
+        .$post("/v1/auth/login", request, {
           headers: { "Content-Type": "application/json" },
         })
         .then((resp) => {
           console.log("response");
           console.log(resp);
-            router.push('/loggedin')
+          router.push("/loggedin");
         })
         .catch((error) => {
           console.log(error.response);
-          message.value = error.response.data;
+          message.value = error.response.data.message;
         });
     };
 
@@ -78,6 +93,6 @@ export default defineComponent({
 
 <style>
 .message {
-    color: red
+  color: red;
 }
 </style>
