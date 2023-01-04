@@ -5,7 +5,7 @@
       :close-on-content-click="false"
       offset-y
       content-class="elevation-0"
-      min-width="500"
+      max-width="500"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn text class="appMenu" v-on="on" v-bind="attrs">

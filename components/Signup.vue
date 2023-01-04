@@ -3,6 +3,17 @@
     <v-card-title>Sign up to Social</v-card-title>
     <v-list-item>
       <v-list-item-content>
+        <div v-if="message">
+          <v-alert
+            type="error"
+            text
+            close-text="Close Alert"
+            dismissible
+            @input="message = ''"
+          >
+            {{ message }}
+          </v-alert>
+        </div>
         <Textfield
           :dense="true"
           :label="email.label"
@@ -38,14 +49,16 @@
           :value="confirmPassword.val"
           @update="confirmPassword.update"
         ></Textfield>
-        <v-btn block text @click="signup" :color="!message ? 'normal' : 'error'">
-            SIGN UP
+        <v-btn
+          block
+          text
+          @click="signup"
+          :color="!message ? 'normal' : 'error'"
+        >
+          SIGN UP
         </v-btn>
-        <p class="message d-flex justify-center pt-1">
-          {{ message }}
-        </p>
-        <div>
-          Have an account? <a href="/login">Log in</a>
+        <div class="pt-5">
+          <div>Have an account? <a href="/login">Log in</a></div>
         </div>
       </v-list-item-content>
     </v-list-item>
@@ -68,8 +81,8 @@ export default defineComponent({
   components: { Textfield },
   setup() {
     const email = new textfield("email", "");
-    const name = new textfield("name", "")
-    const phone = new textfield("phone number", "")
+    const name = new textfield("name", "");
+    const phone = new textfield("phone number", "");
     const password = new textfield("password", "");
     const confirmPassword = new textfield("confirm password", "");
 
@@ -82,10 +95,11 @@ export default defineComponent({
         email: email.val,
         name: name.val,
         phone: phone.val,
-        password: password.val
-      }
+        password: password.val,
+      };
 
-      $axios.$post("/v1/auth/signup", request, {
+      $axios
+        .$post("/v1/auth/signup", request, {
           headers: { "Content-Type": "application/json" },
         })
         .then((resp) => {
@@ -95,12 +109,12 @@ export default defineComponent({
         })
         .catch((error) => {
           console.log(error.response);
-          message.value = error.response.data;
+          message.value = error.response.data.message;
         });
     };
 
     return {
-    name,
+      name,
       name,
       phone,
       email,
