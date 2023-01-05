@@ -1,99 +1,138 @@
 <template>
-  <div>
-    <div>
-      <Board :board="board" />
-    </div>
-
-    <div>
-      <Textfield
-        :label="move.label"
-        :value="move.val"
-        @update="move.update"
-      ></Textfield>
-
-      <div>
-        <v-btn text @click="enter_move()" outlined> move chess piece </v-btn>
+  <div class="d-flex flex-column">
+    <div class="d-flex justify-center">
+      <div style="min-width: 300px">
+        <div>
+          <p class="font-weight-bold">Your Upcoming Trips</p>
+        </div>
+        <div v-if="!upcomingTrips">
+          <div class="box">
+            <div class="d-flex flex-column px-2">
+              <v-skeleton-loader type="list-item-two-line"></v-skeleton-loader>
+            </div>
+          </div>
+        </div>
+        <div v-if="upcomingTrips && upcomingTrips.length !== 0">
+          <div v-for="item in upcomingTrips" :key="item.id">
+            <div class="box">
+              <div class="d-flex flex-column px-2">
+                <div class="d-flex justify-space-between">
+                  <div class="text-overline">
+                    {{ item.name }}
+                  </div>
+                  <div class="text-overline">
+                    {{ item.from_date }}
+                  </div>
+                </div>
+                <div class="d-flex justify-end">
+                  <div class="text-overline">
+                    {{ item.location.city }}, {{ item.location.state }}, {{ item.location.country }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="py-2" />
+          </div>
+        </div>
+        <div v-if="upcomingTrips && upcomingTrips.length === 0">
+          No Trips Found, Please Join or Create a Trip
+        </div>
       </div>
-    
-    <div class="text-overline pt-5">
-        VALID MOVES
     </div>
-    <div>
-        ------------------------------
-    </div>
-      <v-row class="d-flex justify-start">
-        <v-col xs="12" sm="3" md="2" xl="1" v-for="m in moves" :key="m">
-            {{ m }}
-        </v-col>
-      </v-row>
+    <div class="d-flex justify-center mt-5">
+      <div style="min-width: 300px">
+        <div>
+          <p class="font-weight-bold">Your Past Trips</p>
+        </div>
+        <div v-if="!pastTrips">
+          <div class="box">
+            <div class="d-flex flex-column px-2">
+              <v-skeleton-loader type="list-item-two-line"></v-skeleton-loader>
+            </div>
+          </div>
+        </div>
+        <div v-if="pastTrips && pastTrips.length !== 0">
+          <div v-for="item in pastTrips" :key="item.id">
+            <div class="box">
+              <div class="d-flex flex-column px-2">
+                <div class="d-flex justify-space-between">
+                  <div class="text-overline">
+                    {{ item.name }}
+                  </div>
+                  <div class="text-overline">
+                    {{ item.from_date }}
+                  </div>
+                </div>
+                <div class="d-flex justify-end">
+                  <div class="text-overline">
+                    {{ item.location.city }}, {{ item.location.state }}, {{ item.location.country }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="py-2" />
+          </div>
+        </div>
+        <div v-if="pastTrips && pastTrips.length === 0">
+          No Trips Found, Please Join or Create a Trip
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { io } from "socket.io-client";
-
-import Textfield from "~/components/fields/textfield.vue";
-import { textfield } from "~/models/textfield";
-
-import { defineComponent, ref } from "@nuxtjs/composition-api";
+import { defineComponent, useContext, ref } from "@nuxtjs/composition-api";
+import moment from "moment";
 
 export default defineComponent({
-  components: { Textfield },
   setup() {
-    let move = new textfield("enter move");
-    const turn = ref(false);
-    const board = ref([" "] * 64);
-    const moves = ref([]);
+    const { $axios } = useContext();
 
-    const socket = io("http://localhost:5000");
+    const message = ref("");
 
-    socket.on("connect", () => {
-      console.log(`connected to socket ${socket.id}`); // x8WIv7-mJelg7on_ALbx
-      socket.emit("setup", { data: "I'm connected!" });
-    });
+    const upcomingTrips = ref(null);
+    const pastTrips = ref(null)
 
-    socket.on("disconnect", () => {
-      console.log("disconnected socket" + socket.id); // undefined
-    });
+    $axios
+      .$get("/v1/user/cc4139f6-749d-42d9-b0a0-80da18f434fa/trips")
+      .then((resp) => {
+        upcomingTrips.value = resp.filter((item) => {
+          return new Date(item.from_date) > new Date()
+        })
+        upcomingTrips.value.forEach((item) => {
+          item.from_date = moment(item.from_date).format("MMMM DD YYYY")
+        })
 
-    socket.on("send_move", () => {
-      if (turn.value) {
-        socket.emit("send_move", { data: socket.id });
-      }
-    });
+        pastTrips.value = resp.filter((item) => {
+          return new Date(item.from_date) < new Date()
+        })
+        pastTrips.value.forEach((item) => {
+          item.from_date = moment(item.from_date).format("MMMM DD YYYY")
+        })
 
-    socket.on("valid_moves", (valid_moves) => {
-      moves.value = valid_moves;
-    });
+        console.log("upcoming res", upcomingTrips.value)
+        console.log("past trips", pastTrips.value)
+      })
+      .catch((error) => {
+        console.log(error.response);
+        message.value = error.response.data.message;
+      });
 
-    socket.on("move_success", (game) => {
-      console.log("move success");
-      board.value = game;
-    });
-
-    socket.on("move_error", (message) => {
-      console.log("move error");
-      console.log(message);
-    });
-
-    socket.on("setup", (game) => {
-      board.value = game;
-    });
-
-    const hello = async () => {
-      console.log(socket.connected);
-      socket.emit("send_move", { data: "b4e5" });
-    };
-
-    const enter_move = async () => {
-      socket.emit("send_move", move.val);
-    };
-
-    return { hello, board, move, enter_move, moves };
+    return { pastTrips, upcomingTrips };
   },
 });
 </script>
 
 <style>
+.box {
+  border: 1px solid #000000;
+  border-radius: 5px;
+  width: 300px;
+  height: 80px;
+}
+
+.box:hover {
+  border: 2px solid #000000;
+}
 </style>
