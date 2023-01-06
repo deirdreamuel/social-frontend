@@ -58,7 +58,7 @@ export default defineComponent({
   setup() {
     let email = new textfield("email", "deirsre@gmail.com");
     let password = new textfield("password", "hello");
-    const { $axios } = useContext();
+    const { $axios, $auth } = useContext();
     const router = useRouter();
 
     const message = ref("");
@@ -68,14 +68,9 @@ export default defineComponent({
         password: password.val,
       };
 
-      $axios
-        .$post("/v1/auth/login", request, {
-          headers: { "Content-Type": "application/json" },
-        })
+      $auth.loginWith('local', { data: request })
         .then((resp) => {
-          console.log("response");
-          console.log(resp);
-          router.push("/loggedin");
+          router.push("/");
         })
         .catch((error) => {
           console.log(error.response);

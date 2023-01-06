@@ -25,7 +25,8 @@
     },
     "types": [
       "@nuxt/types",
-      "@types/node"
+      "@types/node",
+      "@nuxtjs/auth-next",
     ]
   },
   "exclude": [
@@ -33,4 +34,5 @@
     ".nuxt",
     "dist"
   ]
+  
 }

@@ -17,7 +17,7 @@
             />
           </v-btn>
           <div class="pl-1" />
-          <button  style="border: 1px solid #000000; border-radius: 5px; height: 25px; width: 120px">
+          <button  style="border: 1px solid #000000; border-radius: 5px; height: 25px; width: 120px" @click="router.push('/trips/create')">
             <div class="px-5" style="font-size: 12px">
              Create Trip
             </div>
@@ -108,11 +108,12 @@
 </template>
 
 <script>
-import { defineComponent, useContext, ref } from "@nuxtjs/composition-api";
+import { defineComponent, useContext, ref, useRouter } from "@nuxtjs/composition-api";
 import moment from "moment";
 
 export default defineComponent({
   setup() {
+    const router = useRouter()
     const { $axios } = useContext();
 
     const message = ref("");
@@ -120,12 +121,13 @@ export default defineComponent({
     const upcomingTrips = ref(null);
     const pastTrips = ref(null)
 
-    const refresh = () => {
+
+    function refresh() {
       upcomingTrips.value = null
       pastTrips.value = null
 
       $axios
-        .$get("/v1/user/cc4139f6-749d-42d9-b0a0-80da18f434fa/trips")
+        .$get("/v1/trips/user/me", )
         .then((resp) => {
           upcomingTrips.value = resp.filter((item) => {
             return new Date(item.from_date) > new Date()
@@ -140,9 +142,6 @@ export default defineComponent({
           pastTrips.value.forEach((item) => {
             item.from_date = moment(item.from_date).format("MMMM DD YYYY")
           })
-
-          console.log("upcoming res", upcomingTrips.value)
-          console.log("past trips", pastTrips.value)
         })
         .catch((error) => {
           console.log(error.response);
@@ -152,7 +151,7 @@ export default defineComponent({
 
     refresh()
 
-    return { pastTrips, upcomingTrips, refresh };
+    return { router,pastTrips, upcomingTrips, refresh };
   },
 });
 </script>
