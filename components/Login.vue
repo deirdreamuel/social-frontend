@@ -1,8 +1,8 @@
 <template>
   <v-card max-width="500px" elevation="0">
-    <v-card-title>Sign in to Social</v-card-title>
+    <v-card-title class="text-overline">log in</v-card-title>
     <v-list-item>
-      <v-list-item-content>
+      <v-list-item-content style="max-width: 350px">
         <div v-if="message">
           <v-alert
             type="error"
@@ -28,9 +28,11 @@
           :value="password.val"
           @update="password.update"
         ></Textfield>
-        <v-btn block text @click="login" :color="!message ? 'normal' : 'error'">
-          LOG IN
-        </v-btn>
+        <v-sheet outlined color="black" rounded>
+          <v-btn block text @click="login" :color="!message ? 'normal' : 'error'" dark>
+            LOG IN
+          </v-btn>
+        </v-sheet>
         <div class="pt-5">
           <div>Create account? <a href="/signup">Sign up</a></div>
         </div>
@@ -56,7 +58,7 @@ export default defineComponent({
   setup() {
     let email = new textfield("email", "deirsre@gmail.com");
     let password = new textfield("password", "hello");
-    const { $axios } = useContext();
+    const { $axios, $auth } = useContext();
     const router = useRouter();
 
     const message = ref("");
@@ -66,14 +68,9 @@ export default defineComponent({
         password: password.val,
       };
 
-      $axios
-        .$post("/v1/auth/login", request, {
-          headers: { "Content-Type": "application/json" },
-        })
+      $auth.loginWith('local', { data: request })
         .then((resp) => {
-          console.log("response");
-          console.log(resp);
-          router.push("/loggedin");
+          router.push("/");
         })
         .catch((error) => {
           console.log(error.response);

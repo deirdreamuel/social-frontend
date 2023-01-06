@@ -1,19 +1,14 @@
 <template>
   <v-app>
-    <AppBar />    
+    <AppBar />
 
     <v-main>
       <v-container>
         <Nuxt />
       </v-container>
     </v-main>
-    <v-footer
-      :absolute="!true"
-      app
-    >
-      <span>&copy; {{ new Date().getFullYear() }} by deirdreamuel</span>
-    </v-footer>
-    </v-app>
+    <v-footer :absolute="true" app style="min-height: 500px" color="white" />
+  </v-app>
 </template>
 
 <script lang="ts">
@@ -24,18 +19,18 @@ import { NavItem } from '~/models/navbar'
 export default {
   name: 'DefaultLayout',
   components: { AppBar },
-  setup () {
+  setup() {
     const items: NavItem[] = [
-        {
-            icon: 'mdi-apps',
-            title: 'Welcome',
-            to: '/'
-        },
-        {
-            icon: 'mdi-chart-bubble',
-            title: 'Inspire',
-            to: '/inspire'
-        }
+      {
+        icon: 'mdi-apps',
+        title: 'Welcome',
+        to: '/'
+      },
+      {
+        icon: 'mdi-chart-bubble',
+        title: 'Inspire',
+        to: '/inspire'
+      }
     ]
 
     return { items }
