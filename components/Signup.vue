@@ -1,62 +1,27 @@
 <template>
   <v-card max-width="500px" elevation="0">
-    <v-card-title>Sign up to Social</v-card-title>
+    <v-card-title class="text-overline">Sign up</v-card-title>
     <v-list-item>
-      <v-list-item-content>
+      <v-list-item-content style="max-width: 350px">
         <div v-if="message">
-          <v-alert
-            type="error"
-            text
-            close-text="Close Alert"
-            dismissible
-            @input="message = ''"
-          >
+          <v-alert type="error" text close-text="Close Alert" dismissible @input="message = ''">
             {{ message }}
           </v-alert>
         </div>
-        <Textfield
-          :dense="true"
-          :label="email.label"
-          :value="email.val"
-          @update="email.update"
-        ></Textfield>
-        <Textfield
-          :dense="true"
-          :label="name.label"
-          :value="name.val"
-          @update="name.update"
-        ></Textfield>
-        <Textfield
-          :dense="true"
-          :label="phone.label"
-          :value="phone.val"
-          @update="phone.update"
-        ></Textfield>
+        <Textfield :dense="true" :label="email.label" :value="email.val" @update="email.update"></Textfield>
+        <Textfield :dense="true" :label="name.label" :value="name.val" @update="name.update"></Textfield>
+        <Textfield :dense="true" :label="phone.label" :value="phone.val" @update="phone.update"></Textfield>
 
-        <Textfield
-          :dense="true"
-          :show="false"
-          :showIcon="true"
-          :label="password.label"
-          :value="password.val"
-          @update="password.update"
-        ></Textfield>
-        <Textfield
-          :dense="true"
-          :show="false"
-          :showIcon="true"
-          :label="confirmPassword.label"
-          :value="confirmPassword.val"
-          @update="confirmPassword.update"
-        ></Textfield>
-        <v-btn
-          block
-          text
-          @click="signup"
-          :color="!message ? 'normal' : 'error'"
-        >
-          SIGN UP
-        </v-btn>
+        <Textfield :dense="true" :show="false" :showIcon="true" :label="password.label" :value="password.val"
+          @update="password.update"></Textfield>
+        <Textfield :dense="true" :show="false" :showIcon="true" :label="confirmPassword.label"
+          :value="confirmPassword.val" @update="confirmPassword.update"></Textfield>
+        <v-sheet outlined color="black" rounded>
+          <v-btn block text @click="signup" :color="!message ? 'normal' : 'error'" dark>
+            SIGN UP
+          </v-btn>
+        </v-sheet>
+
         <div class="pt-5">
           <div>Have an account? <a href="/login">Log in</a></div>
         </div>
