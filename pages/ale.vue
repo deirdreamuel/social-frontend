@@ -13,6 +13,7 @@
 import { defineComponent, ref } from "@nuxtjs/composition-api";
 
 export default defineComponent({
+  auth: 'guest',
   setup() {
     const countDownDate = new Date("11 January 2023 03:01 UTC").getTime();
     const countdown = ref('')
