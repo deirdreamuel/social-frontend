@@ -56,9 +56,9 @@ export default defineComponent({
   name: "Login",
   components: { Textfield },
   setup() {
-    let email = new textfield("email", "deirsre@gmail.com");
-    let password = new textfield("password", "hello");
-    const { $axios, $auth } = useContext();
+    let email = new textfield("email", "");
+    let password = new textfield("password", "");
+    const { $auth } = useContext();
     const router = useRouter();
 
     const message = ref("");
@@ -73,6 +73,7 @@ export default defineComponent({
           router.push("/");
         })
         .catch((error) => {
+          console.log(error)
           console.log(error.response);
           message.value = error.response.data.message;
         });
