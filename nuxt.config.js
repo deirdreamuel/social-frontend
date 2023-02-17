@@ -12,15 +12,26 @@ export default {
   auth: {
     strategies: {
       local: {
+        scheme: 'refresh',
         token: {
           property: 'access_token',
           global: true,
           required: true,
           type: 'Bearer'
         },
+        refreshToken: {
+          property: 'refresh_token',
+          data: 'refresh_token',
+          maxAge: 60 * 60 * 24 * 7
+        },
+        user: {
+          property: '',
+        },
         endpoints: {
           login: { url: '/v1/auth/login', method: 'post' },
-          user: false
+          refresh: { url: '/v1/auth/refresh', method: 'post' },
+          user: { url: '/v1/profile', method: 'get' },
+          logout: false,
         }
       }
     }

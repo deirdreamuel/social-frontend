@@ -1,61 +1,57 @@
 <template>
   <div class="text-center">
-    <v-menu
-      v-model="menu"
-      :close-on-content-click="false"
-      offset-y
-      content-class="elevation-0"
-      max-width="500"
-    >
+    <v-menu v-model="menu" :close-on-content-click="false" offset-y content-class="elevation-0" min-width="300" max-width="500">
       <template v-slot:activator="{ on, attrs }">
         <v-btn text class="appMenu" v-on="on" v-bind="attrs">
           <div class="d-flex justify-space-around">
             <div>
-              <v-sheet
-                class="rounded-circle"
-                width="30px"
-                height="30px"
-                :color="avatar"
-              />
+              <v-sheet class="rounded-circle" width="30px" height="30px" :color="avatar" />
             </div>
             <div class="d-flex align-self-center pl-1">
-              <v-icon dense
-                >mdi-chevron-{{ menu ? "up" : "down" }}</v-icon
-              >
+              <v-icon dense>mdi-chevron-{{ menu? "up": "down" }}</v-icon>
             </div>
           </div>
         </v-btn>
       </template>
 
       <v-card outlined>
-          <div class="d-flex justify-start">
-            <v-btn text @click="menu = false">
-              <v-icon x-small>
-                  mdi-window-minimize
-              </v-icon>
-            </v-btn>
-
-          </div>
+        <div class="d-flex justify-space-between">
+          <v-btn text @click="menu = false">
+            <v-icon x-small>
+              mdi-window-minimize
+            </v-icon>
+          </v-btn>
+          <v-btn text @click="menu = false">
+            <v-icon small>
+              mdi-cog
+            </v-icon>
+          </v-btn>
+        </div>
         <v-divider></v-divider>
-        
+
         <v-list>
           <v-list-item>
-             <v-list-item-content v-if="!fullname">
-                <v-list-item-title >Welcome, please login below</v-list-item-title>
-             </v-list-item-content >
-            <v-list-item-content v-if="fullname">
+            <v-list-item-content v-if="!isLoggedIn">
+              <v-list-item-title>Welcome, please login below</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-content v-if="isLoggedIn">
               <v-list-item-title>{{ fullname }}</v-list-item-title>
-              <v-list-item-subtitle>{{ username }}</v-list-item-subtitle>
+              <v-list-item-subtitle>{{ bio }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
 
         <v-divider></v-divider>
 
-        <div>
-            <v-btn text block  @click="loginPage">
-                LOG IN
-            </v-btn>
+        <div v-if="!isLoggedIn">
+          <v-btn text block @click="loginPage">
+            LOG IN
+          </v-btn>
+        </div>
+        <div v-if="isLoggedIn">
+          <v-btn text block @click="handleLogout">
+            LOG OUT
+          </v-btn>
         </div>
       </v-card>
     </v-menu>
@@ -63,10 +59,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, useRouter } from "@nuxtjs/composition-api"
+import { defineComponent, ref, useRouter, useContext, computed } from "@nuxtjs/composition-api"
 export default defineComponent({
   name: "ProfileMenu",
   setup() {
+    const { $auth } = useContext()
+
     const menu = ref(false);
     const randomColor = () => {
       const r = () => Math.floor(256 * Math.random())
@@ -77,22 +75,41 @@ export default defineComponent({
     };
 
     const router = useRouter()
-    const loginPage = () =>  {
-        menu.value = !menu.value
-        router.push('/login')
+    const loginPage = () => {
+      menu.value = !menu.value
+      router.push('/login')
     }
 
     const avatar = ref(randomColor())
-    const fullname = ref('')
-    const username = ref(`@default#342421`)
+
+    const fullname = computed(() => {
+      return $auth.user?.name;
+    });
+
+    const isLoggedIn = computed(() => {
+      return $auth.loggedIn;
+    });
+
+    const bio = computed(() => {
+      return `${$auth.user?.bio}`;
+    });
+
+    function handleLogout() {
+      $auth.logout()
+      menu.value = !menu.value
+      router.push('/login')
+    }
+
 
     return {
       menu,
       avatar,
       fullname,
-      username,
+      bio,
       loginPage,
-      router
+      router,
+      isLoggedIn,
+      handleLogout
     };
   },
 });
